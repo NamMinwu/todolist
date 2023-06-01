@@ -2,6 +2,7 @@ import { ArchiveBoxArrowDown } from 'svelte-hero-icons';
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import axios from 'axios';
+import { API_URL } from '../../lib/constants/api';
 
 export const actions = {
 	default: async (event) => {
@@ -16,17 +17,14 @@ export const actions = {
 			return fail(400, { message: 'Not a match password' });
 		}
 		try {
-			const response = await axios.post('http://54.180.121.245:3000/users', {
+			const response = await axios.post(`${API_URL}/users`, {
 				email: email,
 				password: password,
 				name: name,
 			});
-
-			if (response.status === 201) {
-				throw redirect(302, '/');
-			}
 		} catch (error) {
 			return fail(400, { message: 'message' });
 		}
+		throw redirect(302, '/');
 	},
 } satisfies Actions;

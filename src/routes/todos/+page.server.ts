@@ -1,7 +1,7 @@
-import { ArchiveBoxArrowDown } from 'svelte-hero-icons';
 import type { Actions } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import axios from 'axios';
+import { API_URL } from '../../lib/constants/api';
 
 export const actions = {
 	default: async (event) => {
@@ -9,16 +9,25 @@ export const actions = {
 
 		const title = data.get('title') as string;
 		const content = data.get('content') as string;
+		const accessToken = event.cookies.get('session');
+		const headers = {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${accessToken}`,
+		};
 
 		try {
-			const response = await axios.post('http://54.180.121.245:3000/todos', {
-				title: title,
-				content: content,
-			});
+			const response = await axios.post(
+				`${API_URL}/todos`,
 
-			if (response.status === 201) {
-				event.cookies.set('session', response.data.access_token);
-			}
+				{
+					title: title,
+					content: content,
+				},
+
+				{
+					headers,
+				},
+			);
 		} catch (error) {
 			return fail(400, { message: 'message' });
 		}
